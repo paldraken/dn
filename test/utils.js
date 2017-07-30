@@ -8,10 +8,21 @@ beforeEach(function (done) {
 
 
     function clearDB() {
+        let promises = [];
         for (let i in mongoose.connection.collections) {
-            mongoose.connection.collections[i].remove(function() {});
+
+            +function (index) {
+                promises.push(
+                    new Promise((resolve, reject) => {
+                        mongoose.connection.collections[index].remove(function() { resolve(); });
+                    })
+                );
+            }(i);
+
         }
-        return done();
+        Promise.all(promises)
+            .then(values => {console.log('DONE'); done() })
+            .catch(err => {done()})
     }
 
 
@@ -28,6 +39,32 @@ beforeEach(function (done) {
 });
 
 afterEach(function (done) {
-    mongoose.disconnect();
-    return done();
+    mongoose.disconnect(() => {
+        return done();
+    });
 });
+
+
+module.exports.createOrder = async function (params = {}) {
+    let Order = require('../models/order');
+    let def = {
+        fio: 'Test1',
+        phone: '1234567890',
+        email: 'aaaa@aaaa.ru',
+    };
+    let data = Object.assign({}, def, params);
+    return await Order.create(data);
+};
+
+module.exports.createUser = async function (params = {}) {
+    let User = require('../models/user');
+    let def = {
+        username: 'TestAdmin',
+        password: 'test_password',
+        lastname: 'Admin',
+        firstname: 'Test',
+        api_token: 'test_token',
+    };
+    let data = Object.assign({}, def, params);
+    return await User.create(data);
+};
