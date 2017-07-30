@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <form id="order-form" method="post" action="/order">
+
+      <label>
+        fio
+        <input name="fio">
+      </label>
+
+      <label>
+        phone
+        <input name="phone">
+      </label>
+
+      <label>
+        email
+        <input name="email">
+      </label>
+
+      <input class="file-input" name="photos" type="file">
+      <input name="photos" type="file">
+
+      <button>submit</button>
+
+    </form>
+  </body>
+</html>
+
+<script>
+  $(function () {
+
+      $('#order-form').on('submit', function (e) {
+          e.preventDefault();
+
+          var fd = new FormData();
+          fd.append('fio', $('[name=fio]').val());
+          fd.append('phone', $('[name=phone]').val());
+          fd.append('email', $('[name=email]').val());
+          fd.append('photos', $('.file-input')[0].files[0]);
+
+          $.ajax({
+              url: '/order',
+              data: fd,
+              processData: false,
+              contentType: false,
+              type: 'POST',
+              success: function(data){
+                  console.log(data);
+              }
+          });
+
+      })
+
+  })
+</script>
